@@ -5,7 +5,7 @@ import {
 } from '@react-navigation/bottom-tabs';
 import {CompositeScreenProps} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {Text} from 'native-base';
+import {Icon, Text} from 'native-base';
 import React from 'react';
 import {authLogout} from '../redux/auth/auth.slice';
 import {useAppDispatch} from '../redux/store';
@@ -16,6 +16,8 @@ import {HomeScreen} from '../screens/Home';
 import {PostsScreen} from '../screens/PostsScreen';
 import {UserScreen} from '../screens/UserScreen';
 import {RootStackParamList, RootStackScreenProps} from './Navigator';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import {UploadScreen} from '../screens/UploadScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -31,6 +33,7 @@ export const StackNavigation = () => {
 export type HomeTabParamList = {
   Posts: undefined;
   User: undefined;
+  Upload: undefined;
 };
 
 export type AuthStackScreenProps<T extends keyof HomeTabParamList> = CompositeScreenProps<
@@ -51,14 +54,57 @@ export const HomeNavigation = () => {
     <HomeTab.Navigator
       initialRouteName="Posts"
       // tabBar={props => <MyTabBar {...props} />}
-    >
+      screenOptions={{
+        tabBarShowLabel: false,
+      }}>
       {/* <HomeTab.Screen name="Post" component={Main} /> */}
-      <HomeTab.Screen name="Posts" component={PostsScreen} />
+      <HomeTab.Screen
+        name="Posts"
+        component={PostsScreen}
+        options={{
+          tabBarIcon({focused}) {
+            return (
+              <Icon
+                as={AntDesign}
+                name="home"
+                color={focused ? 'gray.800' : 'gray.400'}
+                size={'lg'}
+              />
+            );
+          },
+        }}
+      />
+      <HomeTab.Screen
+        name="Upload"
+        component={UploadScreen}
+        options={{
+          tabBarIcon({focused}) {
+            return (
+              <Icon
+                as={AntDesign}
+                name="plussquare"
+                color={focused ? 'gray.800' : 'gray.400'}
+                size={'lg'}
+              />
+            );
+          },
+        }}
+      />
       <HomeTab.Screen
         name="User"
         component={UserScreen}
         options={{
           headerTitleAlign: 'left',
+          tabBarIcon({focused}) {
+            return (
+              <Icon
+                as={AntDesign}
+                name="user"
+                color={focused ? 'gray.800' : 'gray.400'}
+                size={'lg'}
+              />
+            );
+          },
           headerRight() {
             return (
               <Text onPress={handleLogout} px={4}>

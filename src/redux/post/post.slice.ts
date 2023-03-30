@@ -43,7 +43,7 @@ export const postsSlice = createSlice({
     });
     builder.addCase(fetchMyPostListRdx.fulfilled, (state, action) => {
       state.myPostsStatus = 'fulfilled';
-      state.myPosts = state.myPosts.concat(action.payload!);
+      state.myPosts = action.payload!;
     });
     builder.addCase(fetchMyPostListRdx.rejected, (state, action) => {
       state.myPostsStatus = 'rejected';
