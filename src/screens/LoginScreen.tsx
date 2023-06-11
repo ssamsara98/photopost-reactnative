@@ -16,6 +16,8 @@ import {AuthStackScreenProps} from '../navigations/AuthNavigator';
 import {postLoginRdx} from '../redux/auth/auth.slice';
 import {useAppDispatch, useAppSelector} from '../redux/store';
 
+// import {SERVER} from '@env';
+
 export const LoginScreen = (props: AuthStackScreenProps<'Login'>) => {
   const dispatch = useAppDispatch();
   const auth = useAppSelector((state) => state.auth);
@@ -34,6 +36,8 @@ export const LoginScreen = (props: AuthStackScreenProps<'Login'>) => {
 
   function handleLogin() {
     if (!!loginForm.userSession && !!loginForm.password) {
+      // cnsole.log('login', loginForm);
+      // cnsole.log(SERVER);
       dispatch(postLoginRdx(loginForm));
     }
   }

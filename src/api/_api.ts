@@ -9,6 +9,7 @@ export const catchServerApiErr: (err: any) => {
   message: string;
   statusCode: number;
 } = (err) => {
+  // cnsole.log(SERVER);
   if (err instanceof AxiosError) {
     return err.response?.data;
   }
