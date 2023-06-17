@@ -37,6 +37,18 @@ export const postsSlice = createSlice({
       state.status = 'rejected';
       state.error = catchServerApiErr(action.error);
     });
+    // refresh
+    builder.addCase(fetchPostListRefreshRdx.pending, (state) => {
+      state.status = 'loading';
+    });
+    builder.addCase(fetchPostListRefreshRdx.fulfilled, (state, action) => {
+      state.status = 'fulfilled';
+      state.posts = action.payload;
+    });
+    builder.addCase(fetchPostListRefreshRdx.rejected, (state, action) => {
+      state.status = 'rejected';
+      state.error = catchServerApiErr(action.error);
+    });
     // my posts
     builder.addCase(fetchMyPostListRdx.pending, (state) => {
       state.myPostsStatus = 'loading';
@@ -54,6 +66,14 @@ export const postsSlice = createSlice({
 
 export const fetchPostListRdx = createAsyncThunk(
   `${postsSlice.name}/fetchPostList`,
+  async () => {
+    const resp = await getPostListServer();
+    return resp.data;
+  },
+);
+
+export const fetchPostListRefreshRdx = createAsyncThunk(
+  `${postsSlice.name}/fetchPostListRefresh`,
   async () => {
     const resp = await getPostListServer();
     return resp.data;

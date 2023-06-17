@@ -1,7 +1,7 @@
 import {Avatar, Box, HStack, Image, Text, VStack} from 'native-base';
-import React, {useEffect} from 'react';
-import {Dimensions, ScrollView} from 'react-native';
-import {fetchPostListRdx} from '../redux/post/post.slice';
+import React, {useCallback, useEffect} from 'react';
+import {Dimensions, RefreshControl, ScrollView} from 'react-native';
+import {fetchPostListRdx, fetchPostListRefreshRdx} from '../redux/post/post.slice';
 import {useAppDispatch, useAppSelector} from '../redux/store';
 import {getImageBySize} from '../utils/s3.helper';
 
@@ -101,9 +101,19 @@ export const PostsScreen = () => {
     }
   }, [postStatus, dispatch]);
 
+  const onRefresh = useCallback(() => {
+    dispatch(fetchPostListRefreshRdx());
+  }, [dispatch]);
+
   return (
     <>
-      <ScrollView>
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={postsReducer.status === 'loading'}
+            onRefresh={onRefresh}
+          />
+        }>
         {postsReducer.posts.map((post, idx) => {
           return (
             <Box key={`${post.id}-${idx}`} mb={1} bgColor={'white'} shadow={'5'}>
