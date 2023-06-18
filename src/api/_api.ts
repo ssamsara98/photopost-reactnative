@@ -1,5 +1,7 @@
-import axios, {AxiosError} from 'axios';
+import axios, {isAxiosError} from 'axios';
 import {SERVER} from '@env';
+
+// console.log('SERVER', SERVER);
 
 export const serverApi = axios.create({
   baseURL: SERVER,
@@ -10,7 +12,8 @@ export const catchServerApiErr: (err: any) => {
   statusCode: number;
 } = (err) => {
   // cnsole.log(SERVER);
-  if (err instanceof AxiosError) {
+  if (isAxiosError(err)) {
+    // console.error(JSON.stringify(err, null, 2));
     return err.response?.data;
   }
   return err;

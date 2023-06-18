@@ -36,7 +36,7 @@ export function UploadScreen() {
     try {
       const resp = await launchImageLibrary({mediaType: 'photo'});
       // console.log(resp);
-      if (resp.assets && resp.assets.length) {
+      if (!resp.didCancel && resp.assets && resp.assets.length) {
         setPhotos(() => [...photos, resp.assets![0]]);
       }
     } catch (err) {
@@ -58,6 +58,7 @@ export function UploadScreen() {
     try {
       const imgResponses = await Promise.all(
         photos.map((photo) => {
+          // console.log(JSON.stringify(photo, null, 2));
           const body = createFormData(photo);
           const imgResp = uploadImageServer(body, auth.signature);
           return imgResp;
@@ -68,12 +69,14 @@ export function UploadScreen() {
       const postBody = {
         caption,
         photoIds: imgResponses.map((imgResp) => imgResp.data.photo.id),
+        // photoIds: [''],
       };
       // console.log(postBody);
       await createPostServer(postBody, auth.signature);
 
       handleResetForm();
     } catch (err) {
+      console.error(err);
       const newErr = catchServerApiErr(err);
       console.error(newErr);
     } finally {
@@ -95,12 +98,16 @@ export function UploadScreen() {
             >
               {photos.length ? (
                 photos.map((img, idx) => (
-                  <Flex key={idx} width={CARD_WIDTH} pb={CARD_WIDTH}>
+                  <Flex
+                    key={idx}
+                    width={CARD_WIDTH}
+                    pb={CARD_WIDTH}
+                    position={'relative'}>
                     <Image
                       source={{
                         uri: img.uri,
                       }}
-                      alt="Alternate Text"
+                      alt={img.fileName}
                       width={CARD_WIDTH}
                       height={CARD_WIDTH}
                       position={'absolute'}

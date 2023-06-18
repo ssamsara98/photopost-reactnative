@@ -108,7 +108,7 @@ export type UploadImageServerRes = {
 };
 export const uploadImageServer = async (body: FormData, sig: Sig) => {
   try {
-    // console.log(body);
+    // console.log('body', JSON.stringify(body, null, 2));
     return serverApi.post<UploadImageServerRes>('/v1/posts/upload', body, {
       headers: {
         ...createAuthorization(sig),

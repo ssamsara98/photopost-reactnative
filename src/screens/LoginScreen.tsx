@@ -37,7 +37,7 @@ export const LoginScreen = (props: AuthStackScreenProps<'Login'>) => {
   function handleLogin() {
     if (!!loginForm.userSession && !!loginForm.password) {
       // cnsole.log('login', loginForm);
-      // cnsole.log(SERVER);
+      // console.log(SERVER);
       dispatch(postLoginRdx(loginForm));
     }
   }
