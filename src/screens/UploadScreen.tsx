@@ -16,6 +16,7 @@ const createFormData = (image: Asset) => {
   data.append('image', {
     name: image.fileName,
     type: image.type,
+    // uri: image.uri,
     uri: Platform.OS === 'ios' ? image.uri?.replace('file://', '') : image.uri,
   });
 
@@ -64,11 +65,11 @@ export function UploadScreen() {
           return imgResp;
         }),
       );
-      // console.log('imgResponses', imgResponses);
+      // console.log('imgResponses', JSON.stringify(imgResponses, null, 2));
 
       const postBody = {
         caption,
-        photoIds: imgResponses.map((imgResp) => imgResp.data.photo.id),
+        photoIds: imgResponses.map((imgResp) => imgResp.photo.id),
         // photoIds: [''],
       };
       // console.log(postBody);

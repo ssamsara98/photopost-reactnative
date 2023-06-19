@@ -1,6 +1,6 @@
 import {AxiosResponse} from 'axios';
 import {createAuthorization, serverApi} from './_api';
-// import {SERVER} from '@env';
+import {SERVER} from '@env';
 
 type RegisterReq = {
   email: string;
@@ -106,34 +106,41 @@ export type UploadImageServerRes = {
     keypath: string;
   };
 };
-export const uploadImageServer = async (body: FormData, sig: Sig) => {
-  try {
-    // console.log('body', JSON.stringify(body, null, 2));
-    return serverApi.post<UploadImageServerRes>('/v1/posts/upload', body, {
-      headers: {
-        ...createAuthorization(sig),
-        'Content-Type': 'multipart/form-data; ',
-      },
-    });
-  } catch (err) {
-    // console.error(err);
-    throw err;
-  }
-
-  // try {
-  //   const response = await fetch(`${SERVER}/v1/posts/upload`, {
+export const uploadImageServer = async (
+  body: FormData,
+  sig: Sig,
+): Promise<UploadImageServerRes> => {
+  // return serverApi
+  //   .post(`${'/v1/posts/upload'}`, body, {
   //     method: 'POST',
-  //     body,
   //     headers: {
   //       ...createAuthorization(sig),
-  //       'Content-Type': 'multipart/form-data; ',
   //     },
+  //   })
+  //   .then((response) => {
+  //     return response.data;
+  //   })
+  //   .catch((error) => {
+  //     // console.log('error', JSON.stringify(error, null, 2));
+  //     throw error;
   //   });
-  //   return response.json();
-  // } catch (err) {
-  //   console.error(err);
-  //   throw err;
-  // }
+
+  return fetch(`${SERVER}/v1/posts/upload`, {
+    method: 'POST',
+    body,
+    headers: {
+      ...createAuthorization(sig),
+    },
+  })
+    .then((response) => response.json())
+    .then((response) => {
+      // console.log('response', response);
+      return response;
+    })
+    .catch((error) => {
+      console.log('error', JSON.stringify(error, null, 2));
+      throw error;
+    });
 };
 
 export type CreatePostRes = {
