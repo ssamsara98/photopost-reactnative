@@ -93,7 +93,7 @@ export const authLogout = createAsyncThunk(`${authSlice.name}/logout`, async () 
 
 export const fetchProfileRdx = createAsyncThunk(
   `${authSlice.name}/profile`,
-  async (sig: Sig) => {
+  async ({sig}: {sig: Sig}) => {
     try {
       const resp = await getProfileServer(sig);
       return resp.data;

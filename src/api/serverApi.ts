@@ -55,46 +55,55 @@ export const getProfileServer = async (sig: Sig) => {
 };
 
 export type PostRes = {
-  id: number;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string;
-  authorId: number;
-  caption: string;
-  isPublished: boolean;
-  photos: [
-    {
-      id: string;
-      createdAt: string;
-      updatedAt: string;
-      deletedAt: string;
-      position: number;
-      postId: string;
-      photoId: string;
-      photo: {
+  pagination: {
+    count: number;
+    hasNext: boolean;
+  };
+  result: {
+    id: number;
+    createdAt: string;
+    updatedAt: string;
+    deletedAt: string;
+    authorId: number;
+    caption: string;
+    isPublished: boolean;
+    photos: [
+      {
         id: string;
         createdAt: string;
         updatedAt: string;
         deletedAt: string;
-        keypath: string;
-      };
-    },
-  ];
+        position: number;
+        postId: string;
+        photoId: string;
+        photo: {
+          id: string;
+          createdAt: string;
+          updatedAt: string;
+          deletedAt: string;
+          keypath: string;
+        };
+      },
+    ];
+  }[];
 };
-export const getPostListServer = async () => {
-  return serverApi.get<PostRes[]>('/v1/posts');
+export const getPostListServer = async (params?: any) => {
+  return serverApi.get<PostRes>('/v1/posts', {
+    params,
+  });
 };
 
-export const getMyPostListServer = async (sig: Sig) => {
-  return serverApi.get<PostRes[]>('/v1/posts/mine', {
+export const getMyPostListServer = async (sig: Sig, params?: any) => {
+  return serverApi.get<PostRes>('/v1/posts/mine', {
     headers: {
       ...createAuthorization(sig),
     },
+    params,
   });
 };
 
 export const getUserPostListServer = async (userId: number) => {
-  return serverApi.get<PostRes[]>(`/v1/posts/u/${userId}`);
+  return serverApi.get<PostRes>(`/v1/posts/u/${userId}`);
 };
 
 export type UploadImageServerRes = {
@@ -125,6 +134,7 @@ export const uploadImageServer = async (
   //     throw error;
   //   });
 
+  // console.log(`SERVER=>${SERVER}`);
   return fetch(`${SERVER}/v1/posts/upload`, {
     method: 'POST',
     body,
