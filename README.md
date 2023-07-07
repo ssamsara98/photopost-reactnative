@@ -1,5 +1,13 @@
 # Photopost React-Native
 
+## Pages
+
+### Main Page
+![Main Page](./readme/main_page.png)
+
+### Auth Page
+![Auth Page](./readme/auth_page.png)
+
 ---
 
 ## Installation
