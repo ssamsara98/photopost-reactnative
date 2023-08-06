@@ -13,8 +13,8 @@ import {
 } from 'native-base';
 import React, {useState} from 'react';
 import {AuthStackScreenProps} from '../navigations/AuthNavigator';
-import {postLoginRdx} from '../redux/auth/auth.slice';
-import {useAppDispatch, useAppSelector} from '../redux/store';
+import {loginRdx} from '../redux/auth/auth.slice';
+import {useAppDispatch, useAppSelector} from '../redux/hooks';
 
 // import {SERVER} from '@env';
 
@@ -38,7 +38,7 @@ export const LoginScreen = (props: AuthStackScreenProps<'Login'>) => {
     if (!!loginForm.userSession && !!loginForm.password) {
       // cnsole.log('login', loginForm);
       // console.log(SERVER);
-      dispatch(postLoginRdx(loginForm));
+      dispatch(loginRdx(loginForm));
     }
   }
 

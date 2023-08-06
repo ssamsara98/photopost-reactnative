@@ -1,17 +1,16 @@
-import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
-import {getProfileServer, serverLogin, Sig} from '../../api/serverApi';
+import {createAsyncThunk, createSelector, createSlice} from '@reduxjs/toolkit';
+import {getProfileServer, renewTokensServer, serverLogin} from '../../api/serverApi';
 import {catchServerApiErr} from '../../api/_api';
 import {deleteData, storeData} from '../../utils/storage.helper';
-import {AsyncStatus} from '../store';
+import {AsyncStatus, RootState} from '../store';
+import {Sig} from '../../@types/server.type';
 
 const initialState: {
   status: AsyncStatus;
   error: any;
   isLogin: boolean;
-  signature: {
-    type: string;
-    token: string;
-  };
+  signature: Sig;
+
   userStatus: AsyncStatus;
   userError: any;
   user: any;
@@ -21,7 +20,8 @@ const initialState: {
   isLogin: false,
   signature: {
     type: '',
-    token: '',
+    accessToken: '',
+    refreshToken: '',
   },
   userStatus: 'idle',
   userError: null,
@@ -29,7 +29,7 @@ const initialState: {
 };
 
 export const authSlice = createSlice({
-  name: 'posts',
+  name: 'auth',
   initialState,
   reducers: {
     login: (state, action) => {
@@ -40,16 +40,16 @@ export const authSlice = createSlice({
   extraReducers(builder) {
     builder
       // login
-      .addCase(postLoginRdx.pending, (state) => {
+      .addCase(loginRdx.pending, (state) => {
         state.status = 'loading';
       })
-      .addCase(postLoginRdx.fulfilled, (state, action) => {
+      .addCase(loginRdx.fulfilled, (state, action) => {
         state.status = 'fulfilled';
         state.isLogin = true;
         state.signature = action.payload;
         storeData('auth', {signature: action.payload, isLogin: true});
       })
-      .addCase(postLoginRdx.rejected, (state, action) => {
+      .addCase(loginRdx.rejected, (state, action) => {
         state.status = 'rejected';
         state.error = action.error;
       })
@@ -57,7 +57,16 @@ export const authSlice = createSlice({
       // logout
       .addCase(authLogout.fulfilled, (state) => {
         state.isLogin = false;
-        state.signature = {type: '', token: ''};
+        state.signature = {type: '', accessToken: '', refreshToken: ''};
+      })
+
+      // renew tokens
+      .addCase(renewTokens.fulfilled, (state, action) => {
+        state.signature = action.payload;
+      })
+      .addCase(renewTokens.rejected, (state) => {
+        state.isLogin = false;
+        state.signature = {type: '', accessToken: '', refreshToken: ''};
       })
 
       // user
@@ -75,7 +84,10 @@ export const authSlice = createSlice({
   },
 });
 
-export const postLoginRdx = createAsyncThunk(
+export const selectAuthReducer = (state: RootState) => state.auth;
+export const selectAuthReducerSafe = createSelector(selectAuthReducer, (auth) => auth);
+
+export const loginRdx = createAsyncThunk(
   `${authSlice.name}/login`,
   async ({userSession, password}: {userSession: string; password: string}) => {
     try {
@@ -90,6 +102,21 @@ export const postLoginRdx = createAsyncThunk(
 export const authLogout = createAsyncThunk(`${authSlice.name}/logout`, async () => {
   await deleteData('auth');
 });
+
+export const renewTokens = createAsyncThunk(
+  `${authSlice.name}/refreshToken`,
+  async (_, {getState}) => {
+    const state = getState() as RootState;
+    try {
+      // console.log('redux - renew tokens');
+      const resp = await renewTokensServer(state.auth.signature);
+      return resp.data;
+    } catch (err) {
+      await deleteData('auth');
+      throw catchServerApiErr(err);
+    }
+  },
+);
 
 export const fetchProfileRdx = createAsyncThunk(
   `${authSlice.name}/profile`,

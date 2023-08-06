@@ -1,5 +1,5 @@
 // /* eslint-disable react/no-unstable-nested-components */
-import React, {useCallback, useEffect} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   createNativeStackNavigator,
   NativeStackScreenProps,
@@ -8,9 +8,10 @@ import {NavigationContainer, NavigatorScreenParams} from '@react-navigation/nati
 import {BlankNavigationHeader} from '../components/BlankNavigationHeader';
 import {AuthNavigation, AuthStackParamList} from './AuthNavigator';
 import {HomeNavigation} from './HomeNavigator';
-import {useAppDispatch, useAppSelector} from '../redux/store';
+import {useAppDispatch, useAppSelector} from '../redux/hooks';
 import {authSlice} from '../redux/auth/auth.slice';
 import {useAsyncStorage} from '@react-native-async-storage/async-storage';
+import {VStack, Heading, Spinner} from 'native-base';
 // import {MyTabBar} from '../components/MyTabBar';
 
 // RootStack
@@ -41,6 +42,7 @@ export const RootNavigation = () => {
 
 export const Navigator = () => {
   const dispatch = useAppDispatch();
+  const [isLoading, setIsLoading] = useState(true);
 
   const {getItem} = useAsyncStorage('auth');
 
@@ -55,10 +57,20 @@ export const Navigator = () => {
       if (auth) {
         dispatch(authSlice.actions.login(auth));
       }
+      setIsLoading(() => false);
     }
     login();
     return () => {};
   }, [dispatch, readItemFromStorage]);
+
+  if (isLoading) {
+    return (
+      <VStack space={'8'} justifyContent="center" alignItems="center" h={'full'}>
+        <Spinner size="lg" />
+        <Heading color="primary.500">Loading</Heading>
+      </VStack>
+    );
+  }
 
   return (
     <NavigationContainer>

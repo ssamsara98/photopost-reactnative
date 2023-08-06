@@ -4,7 +4,7 @@ import {Dimensions, Platform} from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {Asset, launchImageLibrary} from 'react-native-image-picker';
 import {createPostServer, uploadImageServer} from '../api/serverApi';
-import {useAppSelector} from '../redux/store';
+import {useAppSelector} from '../redux/hooks';
 import {catchServerApiErr} from '../api/_api';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 

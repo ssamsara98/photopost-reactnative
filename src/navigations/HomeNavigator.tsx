@@ -8,7 +8,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {Icon, Text} from 'native-base';
 import React from 'react';
 import {authLogout} from '../redux/auth/auth.slice';
-import {useAppDispatch} from '../redux/store';
+import {useAppDispatch} from '../redux/hooks';
 // import {MyTabBar} from '../components/MyTabBar';
 // import Main from '../Main';
 import {DetailsScreen} from '../screens/Details';

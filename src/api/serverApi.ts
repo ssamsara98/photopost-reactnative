@@ -1,17 +1,19 @@
 import {AxiosResponse} from 'axios';
 import {createAuthorization, serverApi} from './_api';
 import {SERVER} from '@env';
+import {
+  CreatePostListResp,
+  LoginReq,
+  LoginRes,
+  PostListResp,
+  RegisterReq,
+  RegisterRes,
+  RenewTokensReq,
+  Sig,
+  UploadImageServerRes,
+} from '../@types/server.type';
 
-type RegisterReq = {
-  email: string;
-  username: string;
-  password: string;
-  name: string;
-};
-type RegisterRes = {
-  type: string;
-  token: string;
-};
+// auth
 export const serverRegister = async (
   email: string,
   username: string,
@@ -29,22 +31,12 @@ export const serverRegister = async (
   );
 };
 
-type LoginReq = {
-  userSession: string;
-  password: string;
-};
-type LoginRes = {
-  type: string;
-  token: string;
-};
 export const serverLogin = async (userSession: string, password: string) => {
   return serverApi.post<LoginRes, AxiosResponse<LoginRes>, LoginReq>('/login', {
     userSession,
     password,
   });
 };
-
-export type Sig = {type: string; token: string};
 
 export const getProfileServer = async (sig: Sig) => {
   return serverApi.get('/me', {
@@ -54,47 +46,22 @@ export const getProfileServer = async (sig: Sig) => {
   });
 };
 
-export type PostRes = {
-  pagination: {
-    count: number;
-    hasNext: boolean;
-  };
-  result: {
-    id: number;
-    createdAt: string;
-    updatedAt: string;
-    deletedAt: string;
-    authorId: number;
-    caption: string;
-    isPublished: boolean;
-    photos: [
-      {
-        id: string;
-        createdAt: string;
-        updatedAt: string;
-        deletedAt: string;
-        position: number;
-        postId: string;
-        photoId: string;
-        photo: {
-          id: string;
-          createdAt: string;
-          updatedAt: string;
-          deletedAt: string;
-          keypath: string;
-        };
-      },
-    ];
-  }[];
+export const renewTokensServer = async (sig: Sig) => {
+  return serverApi.post<Sig, AxiosResponse<Sig>, RenewTokensReq>('/token-renew', {
+    refreshToken: sig.refreshToken,
+  });
 };
+
+// posts
+
 export const getPostListServer = async (params?: any) => {
-  return serverApi.get<PostRes>('/v1/posts', {
+  return serverApi.get<PostListResp>('/v1/posts', {
     params,
   });
 };
 
 export const getMyPostListServer = async (sig: Sig, params?: any) => {
-  return serverApi.get<PostRes>('/v1/posts/mine', {
+  return serverApi.get<PostListResp>('/v1/posts/mine', {
     headers: {
       ...createAuthorization(sig),
     },
@@ -103,18 +70,9 @@ export const getMyPostListServer = async (sig: Sig, params?: any) => {
 };
 
 export const getUserPostListServer = async (userId: number) => {
-  return serverApi.get<PostRes>(`/v1/posts/u/${userId}`);
+  return serverApi.get<PostListResp>(`/v1/posts/u/${userId}`);
 };
 
-export type UploadImageServerRes = {
-  photo: {
-    id: string;
-    createdAt: Date;
-    updatedAt: Date;
-    deletedAt: Date;
-    keypath: string;
-  };
-};
 export const uploadImageServer = async (
   body: FormData,
   sig: Sig,
@@ -153,18 +111,8 @@ export const uploadImageServer = async (
     });
 };
 
-export type CreatePostRes = {
-  id: number;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string;
-  authorId: number;
-  caption: string;
-  isPublished: boolean;
-  photos: null;
-};
 export const createPostServer = async (body: any, sig: Sig) => {
-  return serverApi.post<CreatePostRes>('/v1/posts/', body, {
+  return serverApi.post<CreatePostListResp>('/v1/posts/', body, {
     headers: {
       ...createAuthorization(sig),
     },

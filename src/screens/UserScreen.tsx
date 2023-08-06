@@ -2,9 +2,14 @@ import React, {useCallback, useEffect, useMemo} from 'react';
 import {Avatar, Box, FlatList, HStack, Image, Text} from 'native-base';
 import {Dimensions} from 'react-native';
 import {getImageBySize} from '../utils/s3.helper';
-import {useAppDispatch, useAppSelector} from '../redux/store';
-import {fetchProfileRdx} from '../redux/auth/auth.slice';
-import {fetchMyPostListNextRdx, fetchMyPostListRdx} from '../redux/post/post.slice';
+import {useAppDispatch, useAppSelector} from '../redux/hooks';
+import {fetchProfileRdx, selectAuthReducerSafe} from '../redux/auth/auth.slice';
+import {
+  fetchMyPostListNextRdx,
+  fetchMyPostListRdx,
+  myPostsSelectors,
+  selectMyPostsReducerSafe,
+} from '../redux/post/my-posts.slice';
 
 const {width} = Dimensions.get('window');
 const cardSize = (width - 4) / 3;
@@ -12,10 +17,9 @@ const myPostsLimit = 30;
 
 export function UserScreen() {
   const dispatch = useAppDispatch();
-  const auth = useAppSelector((state) => state.auth);
-  const {myPosts, myPostsStatus, myPostsPagination, myPostsPage} = useAppSelector(
-    (state) => state.posts,
-  );
+  const auth = useAppSelector(selectAuthReducerSafe);
+  const myPostsReducer = useAppSelector(selectMyPostsReducerSafe);
+  const myPosts = myPostsSelectors.selectAll(myPostsReducer);
 
   useEffect(() => {
     dispatch(fetchProfileRdx({sig: auth.signature}));
@@ -49,14 +53,14 @@ export function UserScreen() {
 
   const fetchMoreMyPosts = () => {
     // console.log(
-    //   `fetchMore: hasNext=>${myPostsPagination.hasNext} status=>${myPostsStatus}`,
+    //   `fetchMore: hasNext=>${myPostsReducer.pagination.hasNext} status=>${myPostsReducer.status}`,
     // );
-    if (myPostsPagination.hasNext && myPostsStatus !== 'loading') {
+    if (myPostsReducer.pagination.hasNext && myPostsReducer.status !== 'loading') {
       dispatch(
         fetchMyPostListNextRdx({
           sig: auth.signature,
           params: {
-            page: myPostsPage + 1,
+            page: myPostsReducer.page + 1,
             limit: myPostsLimit,
           },
         }),
@@ -79,7 +83,7 @@ export function UserScreen() {
       <FlatList
         nestedScrollEnabled
         onRefresh={onRefresh}
-        refreshing={myPostsStatus === 'loading'}
+        refreshing={myPostsReducer.status === 'loading'}
         data={posts2d}
         keyExtractor={(item) => `${item.key}`}
         renderItem={({item}) => {

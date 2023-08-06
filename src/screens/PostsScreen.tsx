@@ -1,8 +1,13 @@
 import {Avatar, Box, HStack, Image, Text, VStack} from 'native-base';
 import React, {useCallback, useEffect} from 'react';
 import {Dimensions, FlatList, ScrollView} from 'react-native';
-import {fetchPostListRdx, fetchPostListRefreshRdx} from '../redux/post/post.slice';
-import {useAppDispatch, useAppSelector} from '../redux/store';
+import {
+  fetchPostListRdx,
+  fetchPostListNextRdx,
+  postsSelectors,
+  selectPostsReducerSafe,
+} from '../redux/post/post.slice';
+import {useAppDispatch, useAppSelector} from '../redux/hooks';
 import {getImageBySize} from '../utils/s3.helper';
 
 const CARD_WIDTH = Dimensions.get('window').width;
@@ -12,17 +17,18 @@ const postsLimit = 10;
 
 export const PostsScreen = () => {
   const dispatch = useAppDispatch();
-  const postsReducer = useAppSelector((s) => s.posts);
+  const postsReducer = useAppSelector(selectPostsReducerSafe);
+  const posts = postsSelectors.selectAll(postsReducer);
 
   useEffect(() => {
     if (postsReducer.status === 'idle') {
-      dispatch(fetchPostListRefreshRdx({params: {limit: postsLimit}}));
+      dispatch(fetchPostListRdx({params: {limit: postsLimit}}));
     }
     return () => {};
   }, [dispatch, postsReducer.status]);
 
   const onRefresh = useCallback(() => {
-    dispatch(fetchPostListRefreshRdx({params: {limit: postsLimit}}));
+    dispatch(fetchPostListRdx({params: {limit: postsLimit}}));
   }, [dispatch]);
 
   const fetchMore = () => {
@@ -31,7 +37,7 @@ export const PostsScreen = () => {
     // );
     if (postsReducer.pagination.hasNext && postsReducer.status !== 'loading') {
       dispatch(
-        fetchPostListRdx({
+        fetchPostListNextRdx({
           params: {
             page: postsReducer.page + 1,
             limit: postsLimit,
@@ -45,7 +51,7 @@ export const PostsScreen = () => {
     <FlatList
       onRefresh={onRefresh}
       refreshing={postsReducer.status === 'loading'}
-      data={postsReducer.posts}
+      data={posts}
       keyExtractor={(post) => `${post.id}`}
       renderItem={({item: post}) => {
         return (
