@@ -1,7 +1,9 @@
 {
   "name": "photopost",
-  "version": "0.1.0",
-  "private": true,
+  "version": "0.2.0",
+  "description": "Post your photos",
+  "author": "Sulthon Abdul Malik",
+  "license": "UNLICENSED",
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
@@ -53,5 +55,11 @@
   "peerDependencies": {},
   "jest": {
     "preset": "react-native"
-  }
+  },
+  "keywords": [
+    "photopost",
+    "instagram-clone"
+  ],
+  "repository": "https://github.com/ssamsara98/photopost-reactnative",
+  "bugs": "https://github.com/ssamsara98/photopost-reactnative/issues"
 }
