@@ -5,15 +5,13 @@
  * @format
  */
 
+import { NativeBaseProvider } from 'native-base';
 import React from 'react';
-
-import 'react-native-gesture-handler';
 import { Provider } from 'react-redux';
 
+import 'react-native-gesture-handler';
+
 import { Navigator } from './src/navigations/Navigator';
-
-import { NativeBaseProvider } from 'native-base';
-
 import { store } from './src/redux/store';
 
 function App(): JSX.Element {
